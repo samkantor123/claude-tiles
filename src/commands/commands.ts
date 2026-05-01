@@ -49,6 +49,11 @@ export function registerCommands(
       webviewProvider.refresh();
     }),
 
+    vscode.commands.registerCommand('claudeTiles.setLabelDirectly', (windowId: string, label: string) => {
+      manifestManager.updateWindowFields(windowId, { userLabel: label });
+      webviewProvider.refresh();
+    }),
+
     vscode.commands.registerCommand('claudeTiles.refresh', () => {
       webviewProvider.refresh();
     }),

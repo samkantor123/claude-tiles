@@ -37,7 +37,11 @@ export class TilesWebviewProvider implements vscode.WebviewViewProvider {
           vscode.commands.executeCommand('claudeTiles.assignColorById', msg.windowId);
           break;
         case 'setLabel':
-          vscode.commands.executeCommand('claudeTiles.setLabelById', msg.windowId);
+          if (msg.label !== undefined) {
+            vscode.commands.executeCommand('claudeTiles.setLabelDirectly', msg.windowId, msg.label);
+          } else {
+            vscode.commands.executeCommand('claudeTiles.setLabelById', msg.windowId);
+          }
           break;
         case 'copyBranch':
           if (msg.branch) {
@@ -238,34 +242,66 @@ export class TilesWebviewProvider implements vscode.WebviewViewProvider {
     opacity: 1;
   }
 
-  /* ── hover actions ── */
-  .tile-actions {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    gap: 2px;
-    opacity: 0;
-    transition: opacity 0.1s ease;
-  }
-  .tile:hover .tile-actions { opacity: 1; }
-  .action-btn {
-    width: 24px; height: 24px;
-    border-radius: 6px;
-    border: none;
-    background: transparent;
-    color: var(--vscode-foreground);
+  /* ── clickable dot for color ── */
+  .tile-dot {
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    opacity: 0.5;
-    transition: all 0.1s ease;
+    transition: all 0.15s ease;
   }
-  .action-btn:hover {
-    opacity: 1;
-    background: rgba(255,255,255,0.12);
+  .tile-dot:hover {
+    transform: scale(1.4);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--tile-color) 80%, transparent);
+  }
+
+  /* ── clickable name for editing ── */
+  .tile-name {
+    cursor: text;
+    border-radius: 4px;
+    padding: 1px 4px;
+    margin: -1px -4px;
+    transition: background 0.1s ease;
+  }
+  .tile-name:hover {
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* ── inline edit input ── */
+  .tile-name-input {
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    color: var(--tile-color);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid color-mix(in srgb, var(--tile-color) 50%, transparent);
+    border-radius: 5px;
+    padding: 2px 6px;
+    margin: -3px -6px;
+    outline: none;
+    width: calc(100% + 12px);
+    box-sizing: border-box;
+  }
+
+  /* ── branch copy on click ── */
+  .info-value.mono.copyable {
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 0 3px;
+    margin: 0 -3px;
+    transition: background 0.1s ease;
+  }
+  .info-value.mono.copyable:hover {
+    background: rgba(255,255,255,0.08);
+  }
+
+  /* ── clickable PR ── */
+  .info-value.clickable-pr {
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 0 3px;
+    margin: 0 -3px;
+    transition: background 0.1s ease;
+  }
+  .info-value.clickable-pr:hover {
+    background: rgba(255,255,255,0.08);
   }
 
   /* ── empty state ── */
@@ -286,20 +322,69 @@ export class TilesWebviewProvider implements vscode.WebviewViewProvider {
   ${tilesHtml || '<div class="empty">No active tiles yet.<br>Open a folder to get started.</div>'}
   <script>
     const vscode = acquireVsCodeApi();
+
     document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.action-btn');
-      if (btn) {
+      const el = e.target;
+
+      // Click dot → change color
+      if (el.closest('[data-action="color"]')) {
         e.stopPropagation();
-        const tile = btn.closest('.tile');
-        const action = btn.dataset.action;
-        const windowId = tile.dataset.windowId;
-        if (action === 'color') vscode.postMessage({ type: 'assignColor', windowId });
-        if (action === 'label') vscode.postMessage({ type: 'setLabel', windowId });
-        if (action === 'copy') vscode.postMessage({ type: 'copyBranch', branch: tile.dataset.branch });
-        if (action === 'pr') vscode.postMessage({ type: 'openPr', windowId });
+        const tile = el.closest('.tile');
+        vscode.postMessage({ type: 'assignColor', windowId: tile.dataset.windowId });
         return;
       }
-      const tile = e.target.closest('.tile');
+
+      // Click name → inline edit
+      if (el.closest('[data-action="label"]') && !el.classList.contains('tile-name-input')) {
+        e.stopPropagation();
+        const nameEl = el.closest('[data-action="label"]');
+        const tile = nameEl.closest('.tile');
+        const current = nameEl.textContent;
+        const input = document.createElement('input');
+        input.className = 'tile-name-input';
+        input.value = current;
+        nameEl.replaceWith(input);
+        input.focus();
+        input.select();
+
+        const commit = () => {
+          const val = input.value.trim();
+          if (val && val !== current) {
+            vscode.postMessage({ type: 'setLabel', windowId: tile.dataset.windowId, label: val });
+          }
+          const span = document.createElement('div');
+          span.className = 'tile-name';
+          span.dataset.action = 'label';
+          span.textContent = val || current;
+          input.replaceWith(span);
+        };
+
+        input.addEventListener('blur', commit);
+        input.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
+          if (ev.key === 'Escape') { input.value = current; input.blur(); }
+        });
+        return;
+      }
+
+      // Click branch → copy
+      if (el.closest('.copyable')) {
+        e.stopPropagation();
+        const tile = el.closest('.tile');
+        vscode.postMessage({ type: 'copyBranch', branch: tile.dataset.branch });
+        return;
+      }
+
+      // Click PR → open
+      if (el.closest('.clickable-pr')) {
+        e.stopPropagation();
+        const tile = el.closest('.tile');
+        vscode.postMessage({ type: 'openPr', windowId: tile.dataset.windowId });
+        return;
+      }
+
+      // Click tile → switch window
+      const tile = el.closest('.tile');
       if (tile && !tile.classList.contains('current')) {
         const d = tile.dataset.entry;
         if (d) vscode.postMessage({ type: 'switchWindow', entry: JSON.parse(d) });
@@ -322,10 +407,10 @@ export class TilesWebviewProvider implements vscode.WebviewViewProvider {
     const rows: string[] = [];
 
     if (entry.branch) {
-      rows.push(infoRow('branch', `<span class="info-value mono">${esc(entry.branch)}</span>`));
+      rows.push(infoRow('branch', `<span class="info-value mono copyable">${esc(entry.branch)}</span>`));
     }
     if (entry.prTitle) {
-      rows.push(infoRow('pr', `<span class="info-value pr">#${entry.prNumber} ${esc(entry.prTitle)}</span>`));
+      rows.push(infoRow('pr', `<span class="info-value pr clickable-pr">#${entry.prNumber} ${esc(entry.prTitle)}</span>`));
     }
     if (entry.remoteHost) {
       rows.push(infoRow('host', `<span class="info-value mono">${esc(entry.remoteHost)}</span>`));
@@ -339,24 +424,15 @@ export class TilesWebviewProvider implements vscode.WebviewViewProvider {
       ? `<span class="live-badge"><span class="live-dot"></span>Active</span>`
       : `<span class="tile-time">${formatRelativeTime(entry.lastActivity)}</span>`;
 
-    // Actions on hover
-    const actions = [
-      `<button class="action-btn" data-action="color" title="Change color">&#x25CF;</button>`,
-      entry.branch ? `<button class="action-btn" data-action="copy" title="Copy branch name">&#x2398;</button>` : '',
-      `<button class="action-btn" data-action="label" title="Set label">&#x270E;</button>`,
-      entry.prNumber ? `<button class="action-btn" data-action="pr" title="Open PR">&#x2197;</button>` : '',
-    ].filter(Boolean).join('');
-
     return `
       <div class="tile ${isCurrent ? 'current' : ''}"
            style="--tile-color: ${color}"
            data-window-id="${escapeAttr(entry.windowId)}"
            data-branch="${escapeAttr(entry.branch)}"
            data-entry="${entryJson}">
-        <div class="tile-actions">${actions}</div>
         <div class="tile-row-1">
-          <div class="tile-dot"></div>
-          <div class="tile-name">${esc(name)}</div>
+          <div class="tile-dot" data-action="color"></div>
+          <div class="tile-name" data-action="label">${esc(name)}</div>
           ${timeBadge}
         </div>
         ${rows.length ? `<div class="tile-info">${rows.join('')}</div>` : ''}
