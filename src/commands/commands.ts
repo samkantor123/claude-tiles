@@ -14,11 +14,11 @@ export function registerCommands(
   currentWindowId: string
 ): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand('contextManager.switchWindow', (entry: WindowEntry) => {
+    vscode.commands.registerCommand('claudeTiles.switchWindow', (entry: WindowEntry) => {
       switchToWindow(entry);
     }),
 
-    vscode.commands.registerCommand('contextManager.assignColor', async (item: WindowTreeItem) => {
+    vscode.commands.registerCommand('claudeTiles.assignColor', async (item: WindowTreeItem) => {
       const entry = item?.entry;
       if (!entry) return;
 
@@ -30,7 +30,7 @@ export function registerCommands(
       treeProvider.refresh();
     }),
 
-    vscode.commands.registerCommand('contextManager.setLabel', async (item: WindowTreeItem) => {
+    vscode.commands.registerCommand('claudeTiles.setLabel', async (item: WindowTreeItem) => {
       const entry = item?.entry;
       if (!entry) return;
 
@@ -45,11 +45,11 @@ export function registerCommands(
       treeProvider.refresh();
     }),
 
-    vscode.commands.registerCommand('contextManager.refresh', () => {
+    vscode.commands.registerCommand('claudeTiles.refresh', () => {
       treeProvider.refresh();
     }),
 
-    vscode.commands.registerCommand('contextManager.copyBranch', async (item: WindowTreeItem) => {
+    vscode.commands.registerCommand('claudeTiles.copyBranch', async (item: WindowTreeItem) => {
       const branch = item?.entry?.branch;
       if (branch) {
         await vscode.env.clipboard.writeText(branch);
@@ -57,7 +57,7 @@ export function registerCommands(
       }
     }),
 
-    vscode.commands.registerCommand('contextManager.openPr', (item: WindowTreeItem) => {
+    vscode.commands.registerCommand('claudeTiles.openPr', (item: WindowTreeItem) => {
       const entry = item?.entry;
       if (!entry?.prNumber) return;
       // Best effort — open GitHub PR in browser via gh CLI

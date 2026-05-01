@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Manifest, WindowEntry } from '../types';
 
-const MANIFEST_FILENAME = 'context-manager-manifest.json';
+const MANIFEST_FILENAME = 'claude-tiles-manifest.json';
 const HEARTBEAT_INTERVAL_MS = 15_000;
 const STALE_TTL_MS = 45_000;
 const WATCH_DEBOUNCE_MS = 200;
@@ -109,7 +109,7 @@ export class ManifestManager {
       fs.writeFileSync(tmpPath, JSON.stringify(manifest, null, 2), 'utf8');
       fs.renameSync(tmpPath, this.manifestPath);
     } catch (err) {
-      console.error('Context Manager: failed to write manifest', err);
+      console.error('Claude Tiles: failed to write manifest', err);
     } finally {
       // Small delay before allowing watch events to process our own write
       setTimeout(() => { this.writing = false; }, 50);

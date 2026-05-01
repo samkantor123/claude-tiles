@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { COLOR_KEYS, ColorKey, Manifest } from '../types';
 
-const GLOBAL_STATE_KEY = 'contextManager.colorOverrides';
+const GLOBAL_STATE_KEY = 'claudeTiles.colorOverrides';
 
 export class ColorManager {
   private overrides: Record<string, ColorKey> = {};

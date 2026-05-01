@@ -19,10 +19,10 @@ const DETECTION_REFRESH_MS = 60_000;
 
 export async function activate(context: vscode.ExtensionContext) {
   // Generate or retrieve a stable window ID for this workspace
-  currentWindowId = context.workspaceState.get<string>('contextManager.windowId') ?? '';
+  currentWindowId = context.workspaceState.get<string>('claudeTiles.windowId') ?? '';
   if (!currentWindowId) {
     currentWindowId = crypto.randomUUID();
-    await context.workspaceState.update('contextManager.windowId', currentWindowId);
+    await context.workspaceState.update('claudeTiles.windowId', currentWindowId);
   }
 
   // Initialize manifest manager with globalStorage path
@@ -60,7 +60,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // TreeView
   const treeProvider = new WindowTreeProvider(manifestManager, currentWindowId);
-  const treeView = vscode.window.createTreeView('contextManager.windowList', {
+  const treeView = vscode.window.createTreeView('claudeTiles.windowList', {
     treeDataProvider: treeProvider,
     showCollapseAll: false,
   });

@@ -1,14 +1,19 @@
 {
-  "name": "context-manager",
-  "displayName": "Context Manager",
-  "description": "See and switch between all your VS Code windows with color-coded context",
+  "name": "claude-tiles",
+  "displayName": "Claude Tiles",
+  "description": "Color-coded window manager for Claude Code power users. See every vibe coding session at a glance.",
   "version": "0.1.0",
-  "publisher": "samuel-kantor",
+  "publisher": "samkantor123",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samkantor123/claude-tiles"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
   "extensionKind": ["ui"],
   "categories": ["Other"],
+  "keywords": ["claude", "claude-code", "window-manager", "context", "vibe-coding", "multi-window", "tiles", "productivity"],
   "activationEvents": ["onStartupFinished"],
   "main": "./dist/extension.js",
   "scripts": {
@@ -26,119 +31,119 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "context-manager",
-          "title": "Context Manager",
-          "icon": "media/context-manager-icon.svg"
+          "id": "claude-tiles",
+          "title": "Claude Tiles",
+          "icon": "media/claude-tiles-icon.svg"
         }
       ]
     },
     "views": {
-      "context-manager": [
+      "claude-tiles": [
         {
-          "id": "contextManager.windowList",
-          "name": "Windows"
+          "id": "claudeTiles.windowList",
+          "name": "Tiles"
         }
       ]
     },
     "commands": [
       {
-        "command": "contextManager.switchWindow",
-        "title": "Switch to Window",
-        "category": "Context Manager"
+        "command": "claudeTiles.switchWindow",
+        "title": "Switch to Tile",
+        "category": "Claude Tiles"
       },
       {
-        "command": "contextManager.assignColor",
+        "command": "claudeTiles.assignColor",
         "title": "Assign Color",
-        "category": "Context Manager"
+        "category": "Claude Tiles"
       },
       {
-        "command": "contextManager.setLabel",
+        "command": "claudeTiles.setLabel",
         "title": "Set Label",
-        "category": "Context Manager"
+        "category": "Claude Tiles"
       },
       {
-        "command": "contextManager.refresh",
+        "command": "claudeTiles.refresh",
         "title": "Refresh",
         "icon": "$(refresh)",
-        "category": "Context Manager"
+        "category": "Claude Tiles"
       },
       {
-        "command": "contextManager.copyBranch",
+        "command": "claudeTiles.copyBranch",
         "title": "Copy Branch Name",
-        "category": "Context Manager"
+        "category": "Claude Tiles"
       },
       {
-        "command": "contextManager.openPr",
+        "command": "claudeTiles.openPr",
         "title": "Open PR in Browser",
-        "category": "Context Manager"
+        "category": "Claude Tiles"
       }
     ],
     "menus": {
       "view/item/context": [
         {
-          "command": "contextManager.assignColor",
-          "when": "view == contextManager.windowList"
+          "command": "claudeTiles.assignColor",
+          "when": "view == claudeTiles.windowList"
         },
         {
-          "command": "contextManager.setLabel",
-          "when": "view == contextManager.windowList"
+          "command": "claudeTiles.setLabel",
+          "when": "view == claudeTiles.windowList"
         },
         {
-          "command": "contextManager.copyBranch",
-          "when": "view == contextManager.windowList"
+          "command": "claudeTiles.copyBranch",
+          "when": "view == claudeTiles.windowList"
         },
         {
-          "command": "contextManager.openPr",
-          "when": "view == contextManager.windowList && viewItem =~ /hasPr/"
+          "command": "claudeTiles.openPr",
+          "when": "view == claudeTiles.windowList && viewItem =~ /hasPr/"
         }
       ],
       "view/title": [
         {
-          "command": "contextManager.refresh",
-          "when": "view == contextManager.windowList",
+          "command": "claudeTiles.refresh",
+          "when": "view == claudeTiles.windowList",
           "group": "navigation"
         }
       ]
     },
     "colors": [
       {
-        "id": "contextManager.red",
-        "description": "Red context color",
+        "id": "claudeTiles.red",
+        "description": "Red tile color",
         "defaults": { "dark": "#e06c75", "light": "#e45649", "highContrast": "#e06c75", "highContrastLight": "#e45649" }
       },
       {
-        "id": "contextManager.blue",
-        "description": "Blue context color",
+        "id": "claudeTiles.blue",
+        "description": "Blue tile color",
         "defaults": { "dark": "#61afef", "light": "#4078f2", "highContrast": "#61afef", "highContrastLight": "#4078f2" }
       },
       {
-        "id": "contextManager.green",
-        "description": "Green context color",
+        "id": "claudeTiles.green",
+        "description": "Green tile color",
         "defaults": { "dark": "#98c379", "light": "#50a14f", "highContrast": "#98c379", "highContrastLight": "#50a14f" }
       },
       {
-        "id": "contextManager.yellow",
-        "description": "Yellow context color",
+        "id": "claudeTiles.yellow",
+        "description": "Yellow tile color",
         "defaults": { "dark": "#e5c07b", "light": "#c18401", "highContrast": "#e5c07b", "highContrastLight": "#c18401" }
       },
       {
-        "id": "contextManager.purple",
-        "description": "Purple context color",
+        "id": "claudeTiles.purple",
+        "description": "Purple tile color",
         "defaults": { "dark": "#c678dd", "light": "#a626a4", "highContrast": "#c678dd", "highContrastLight": "#a626a4" }
       },
       {
-        "id": "contextManager.orange",
-        "description": "Orange context color",
+        "id": "claudeTiles.orange",
+        "description": "Orange tile color",
         "defaults": { "dark": "#d19a66", "light": "#e4564a", "highContrast": "#d19a66", "highContrastLight": "#e4564a" }
       },
       {
-        "id": "contextManager.cyan",
-        "description": "Cyan context color",
+        "id": "claudeTiles.cyan",
+        "description": "Cyan tile color",
         "defaults": { "dark": "#56b6c2", "light": "#0184bc", "highContrast": "#56b6c2", "highContrastLight": "#0184bc" }
       },
       {
-        "id": "contextManager.pink",
-        "description": "Pink context color",
+        "id": "claudeTiles.pink",
+        "description": "Pink tile color",
         "defaults": { "dark": "#e06c9a", "light": "#d63384", "highContrast": "#e06c9a", "highContrastLight": "#d63384" }
       }
     ]

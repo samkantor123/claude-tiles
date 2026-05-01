@@ -23,12 +23,12 @@ export class WindowTreeItem extends vscode.TreeItem {
 
     this.iconPath = new vscode.ThemeIcon(
       'circle-filled',
-      new vscode.ThemeColor(`contextManager.${entry.colorKey}`)
+      new vscode.ThemeColor(`claudeTiles.${entry.colorKey}`)
     );
 
     if (!isCurrent) {
       this.command = {
-        command: 'contextManager.switchWindow',
+        command: 'claudeTiles.switchWindow',
         title: 'Switch to Window',
         arguments: [entry],
       };
