@@ -1,0 +1,146 @@
+{
+  "name": "context-manager",
+  "displayName": "Context Manager",
+  "description": "See and switch between all your VS Code windows with color-coded context",
+  "version": "0.1.0",
+  "publisher": "samuel-kantor",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "extensionKind": ["ui"],
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "esbuild": "^0.19.0"
+  },
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "context-manager",
+          "title": "Context Manager",
+          "icon": "media/context-manager-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "context-manager": [
+        {
+          "id": "contextManager.windowList",
+          "name": "Windows"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "contextManager.switchWindow",
+        "title": "Switch to Window",
+        "category": "Context Manager"
+      },
+      {
+        "command": "contextManager.assignColor",
+        "title": "Assign Color",
+        "category": "Context Manager"
+      },
+      {
+        "command": "contextManager.setLabel",
+        "title": "Set Label",
+        "category": "Context Manager"
+      },
+      {
+        "command": "contextManager.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)",
+        "category": "Context Manager"
+      },
+      {
+        "command": "contextManager.copyBranch",
+        "title": "Copy Branch Name",
+        "category": "Context Manager"
+      },
+      {
+        "command": "contextManager.openPr",
+        "title": "Open PR in Browser",
+        "category": "Context Manager"
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "contextManager.assignColor",
+          "when": "view == contextManager.windowList"
+        },
+        {
+          "command": "contextManager.setLabel",
+          "when": "view == contextManager.windowList"
+        },
+        {
+          "command": "contextManager.copyBranch",
+          "when": "view == contextManager.windowList"
+        },
+        {
+          "command": "contextManager.openPr",
+          "when": "view == contextManager.windowList && viewItem =~ /hasPr/"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "contextManager.refresh",
+          "when": "view == contextManager.windowList",
+          "group": "navigation"
+        }
+      ]
+    },
+    "colors": [
+      {
+        "id": "contextManager.red",
+        "description": "Red context color",
+        "defaults": { "dark": "#e06c75", "light": "#e45649", "highContrast": "#e06c75", "highContrastLight": "#e45649" }
+      },
+      {
+        "id": "contextManager.blue",
+        "description": "Blue context color",
+        "defaults": { "dark": "#61afef", "light": "#4078f2", "highContrast": "#61afef", "highContrastLight": "#4078f2" }
+      },
+      {
+        "id": "contextManager.green",
+        "description": "Green context color",
+        "defaults": { "dark": "#98c379", "light": "#50a14f", "highContrast": "#98c379", "highContrastLight": "#50a14f" }
+      },
+      {
+        "id": "contextManager.yellow",
+        "description": "Yellow context color",
+        "defaults": { "dark": "#e5c07b", "light": "#c18401", "highContrast": "#e5c07b", "highContrastLight": "#c18401" }
+      },
+      {
+        "id": "contextManager.purple",
+        "description": "Purple context color",
+        "defaults": { "dark": "#c678dd", "light": "#a626a4", "highContrast": "#c678dd", "highContrastLight": "#a626a4" }
+      },
+      {
+        "id": "contextManager.orange",
+        "description": "Orange context color",
+        "defaults": { "dark": "#d19a66", "light": "#e4564a", "highContrast": "#d19a66", "highContrastLight": "#e4564a" }
+      },
+      {
+        "id": "contextManager.cyan",
+        "description": "Cyan context color",
+        "defaults": { "dark": "#56b6c2", "light": "#0184bc", "highContrast": "#56b6c2", "highContrastLight": "#0184bc" }
+      },
+      {
+        "id": "contextManager.pink",
+        "description": "Pink context color",
+        "defaults": { "dark": "#e06c9a", "light": "#d63384", "highContrast": "#e06c9a", "highContrastLight": "#d63384" }
+      }
+    ]
+  }
+}
