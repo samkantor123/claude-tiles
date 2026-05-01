@@ -4,10 +4,11 @@ import { ManifestManager } from './manifest/manifestManager';
 import { detectBranch } from './detection/branchDetector';
 import { detectRemoteHost } from './detection/remoteHostDetector';
 import { detectPr } from './detection/prDetector';
-import { WindowTreeProvider } from './tree/windowTreeProvider';
+import { TilesWebviewProvider } from './webview/tilesWebviewProvider';
 import { ColorManager } from './colors/colorManager';
 import { StatusBarManager } from './statusbar/statusBarManager';
 import { registerCommands } from './commands/commands';
+import { applyTitleBarColor, applyWindowTitle } from './titleBar/titleBarColorizer';
 import { WindowEntry } from './types';
 
 let manifestManager: ManifestManager;
@@ -18,24 +19,20 @@ const HEARTBEAT_INTERVAL_MS = 30_000;
 const DETECTION_REFRESH_MS = 60_000;
 
 export async function activate(context: vscode.ExtensionContext) {
-  // Generate or retrieve a stable window ID for this workspace
   currentWindowId = context.workspaceState.get<string>('claudeTiles.windowId') ?? '';
   if (!currentWindowId) {
     currentWindowId = crypto.randomUUID();
     await context.workspaceState.update('claudeTiles.windowId', currentWindowId);
   }
 
-  // Initialize manifest manager with globalStorage path
   const storageDir = context.globalStorageUri.fsPath;
   manifestManager = new ManifestManager(storageDir);
   await manifestManager.initialize();
   context.subscriptions.push({ dispose: () => manifestManager.dispose() });
 
-  // Color manager
   const colorManager = new ColorManager(context.globalState);
   const assignedColor = colorManager.autoAssign(currentWindowId, manifestManager.getManifest());
 
-  // Detect initial context
   const [branch, prInfo] = await Promise.all([detectBranch(), detectPr()]);
   const remoteHost = detectRemoteHost();
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
@@ -46,8 +43,8 @@ export async function activate(context: vscode.ExtensionContext) {
     pid: process.pid,
     workspaceUri: workspaceFolder?.uri.toString() ?? '',
     workspaceName: workspaceFolder?.name ?? 'Untitled',
-    branch: branch,
-    remoteHost: remoteHost,
+    branch,
+    remoteHost,
     prTitle: prInfo?.title ?? null,
     prNumber: prInfo?.number ?? null,
     lastActivity: now,
@@ -58,31 +55,31 @@ export async function activate(context: vscode.ExtensionContext) {
 
   manifestManager.updateWindow(currentWindowId, entry);
 
-  // TreeView
-  const treeProvider = new WindowTreeProvider(manifestManager, currentWindowId);
-  const treeView = vscode.window.createTreeView('claudeTiles.windowList', {
-    treeDataProvider: treeProvider,
-    showCollapseAll: false,
-  });
-  context.subscriptions.push(treeView);
+  // Color the title bar and set a clear window title
+  applyTitleBarColor(assignedColor);
+  applyWindowTitle(branch, remoteHost);
 
-  // Update badge count
-  function updateBadge() {
-    const count = Object.keys(manifestManager.getManifest().windows).length;
-    treeView.badge = count > 1 ? { value: count, tooltip: `${count} active windows` } : undefined;
-  }
-  manifestManager.onDidChange(updateBadge);
-  updateBadge();
+  // Webview sidebar
+  const webviewProvider = new TilesWebviewProvider(
+    context.extensionUri,
+    manifestManager,
+    currentWindowId,
+  );
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider('claudeTiles.windowList', webviewProvider, {
+      webviewOptions: { retainContextWhenHidden: true },
+    }),
+  );
 
   // Status bar
   const statusBar = new StatusBarManager();
   statusBar.update(entry);
   context.subscriptions.push(statusBar);
 
-  // Register commands
-  registerCommands(context, manifestManager, treeProvider, colorManager, currentWindowId);
+  // Commands
+  registerCommands(context, manifestManager, webviewProvider, colorManager, currentWindowId);
 
-  // Activity tracking — throttled
+  // Activity tracking
   let lastActivityWrite = 0;
   function trackActivity() {
     const now = Date.now();
@@ -94,14 +91,12 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   context.subscriptions.push(
-    vscode.window.onDidChangeWindowState(e => {
-      if (e.focused) trackActivity();
-    }),
+    vscode.window.onDidChangeWindowState(e => { if (e.focused) trackActivity(); }),
     vscode.workspace.onDidChangeTextDocument(() => trackActivity()),
     vscode.workspace.onDidSaveTextDocument(() => trackActivity()),
   );
 
-  // Heartbeat — keep this window alive in the manifest
+  // Heartbeat
   const heartbeatTimer = setInterval(() => {
     manifestManager.updateWindowFields(currentWindowId, {
       lastHeartbeat: new Date().toISOString(),
@@ -109,7 +104,7 @@ export async function activate(context: vscode.ExtensionContext) {
   }, HEARTBEAT_INTERVAL_MS);
   context.subscriptions.push({ dispose: () => clearInterval(heartbeatTimer) });
 
-  // Periodic re-detection of branch/PR (handles checkouts, new PRs)
+  // Periodic re-detection
   const detectionTimer = setInterval(async () => {
     const [newBranch, newPr] = await Promise.all([detectBranch(), detectPr()]);
     const fields: Partial<WindowEntry> = {};
@@ -126,11 +121,13 @@ export async function activate(context: vscode.ExtensionContext) {
     if (Object.keys(fields).length > 0) {
       manifestManager.updateWindowFields(currentWindowId, fields);
       statusBar.update(entry);
+      if (fields.branch !== undefined) {
+        applyWindowTitle(entry.branch, entry.remoteHost);
+      }
     }
   }, DETECTION_REFRESH_MS);
   context.subscriptions.push({ dispose: () => clearInterval(detectionTimer) });
 
-  // Update status bar when manifest changes (e.g., color changed from another window)
   manifestManager.onDidChange(() => {
     const updated = manifestManager.getWindow(currentWindowId);
     if (updated) {

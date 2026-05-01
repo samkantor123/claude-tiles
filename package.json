@@ -32,7 +32,7 @@
       "activitybar": [
         {
           "id": "claude-tiles",
-          "title": "Claude Tiles",
+          "title": "Tiles",
           "icon": "media/claude-tiles-icon.svg"
         }
       ]
@@ -40,8 +40,9 @@
     "views": {
       "claude-tiles": [
         {
+          "type": "webview",
           "id": "claudeTiles.windowList",
-          "name": "Tiles"
+          "name": ""
         }
       ]
     },
@@ -52,99 +53,66 @@
         "category": "Claude Tiles"
       },
       {
-        "command": "claudeTiles.assignColor",
+        "command": "claudeTiles.assignColorById",
         "title": "Assign Color",
         "category": "Claude Tiles"
       },
       {
-        "command": "claudeTiles.setLabel",
+        "command": "claudeTiles.setLabelById",
         "title": "Set Label",
         "category": "Claude Tiles"
       },
       {
         "command": "claudeTiles.refresh",
-        "title": "Refresh",
-        "icon": "$(refresh)",
+        "title": "Refresh Tiles",
         "category": "Claude Tiles"
       },
       {
-        "command": "claudeTiles.copyBranch",
-        "title": "Copy Branch Name",
-        "category": "Claude Tiles"
-      },
-      {
-        "command": "claudeTiles.openPr",
+        "command": "claudeTiles.openPrById",
         "title": "Open PR in Browser",
         "category": "Claude Tiles"
       }
     ],
-    "menus": {
-      "view/item/context": [
-        {
-          "command": "claudeTiles.assignColor",
-          "when": "view == claudeTiles.windowList"
-        },
-        {
-          "command": "claudeTiles.setLabel",
-          "when": "view == claudeTiles.windowList"
-        },
-        {
-          "command": "claudeTiles.copyBranch",
-          "when": "view == claudeTiles.windowList"
-        },
-        {
-          "command": "claudeTiles.openPr",
-          "when": "view == claudeTiles.windowList && viewItem =~ /hasPr/"
-        }
-      ],
-      "view/title": [
-        {
-          "command": "claudeTiles.refresh",
-          "when": "view == claudeTiles.windowList",
-          "group": "navigation"
-        }
-      ]
-    },
     "colors": [
       {
-        "id": "claudeTiles.red",
-        "description": "Red tile color",
-        "defaults": { "dark": "#e06c75", "light": "#e45649", "highContrast": "#e06c75", "highContrastLight": "#e45649" }
-      },
-      {
         "id": "claudeTiles.blue",
-        "description": "Blue tile color",
-        "defaults": { "dark": "#61afef", "light": "#4078f2", "highContrast": "#61afef", "highContrastLight": "#4078f2" }
+        "description": "Soft blue tile color",
+        "defaults": { "dark": "#7eb8da", "light": "#5a9abf", "highContrast": "#7eb8da", "highContrastLight": "#5a9abf" }
       },
       {
         "id": "claudeTiles.green",
-        "description": "Green tile color",
-        "defaults": { "dark": "#98c379", "light": "#50a14f", "highContrast": "#98c379", "highContrastLight": "#50a14f" }
-      },
-      {
-        "id": "claudeTiles.yellow",
-        "description": "Yellow tile color",
-        "defaults": { "dark": "#e5c07b", "light": "#c18401", "highContrast": "#e5c07b", "highContrastLight": "#c18401" }
+        "description": "Sage green tile color",
+        "defaults": { "dark": "#8bbf9f", "light": "#6a9e80", "highContrast": "#8bbf9f", "highContrastLight": "#6a9e80" }
       },
       {
         "id": "claudeTiles.purple",
-        "description": "Purple tile color",
-        "defaults": { "dark": "#c678dd", "light": "#a626a4", "highContrast": "#c678dd", "highContrastLight": "#a626a4" }
-      },
-      {
-        "id": "claudeTiles.orange",
-        "description": "Orange tile color",
-        "defaults": { "dark": "#d19a66", "light": "#e4564a", "highContrast": "#d19a66", "highContrastLight": "#e4564a" }
+        "description": "Lavender tile color",
+        "defaults": { "dark": "#b4a7d6", "light": "#9688b8", "highContrast": "#b4a7d6", "highContrastLight": "#9688b8" }
       },
       {
         "id": "claudeTiles.cyan",
-        "description": "Cyan tile color",
-        "defaults": { "dark": "#56b6c2", "light": "#0184bc", "highContrast": "#56b6c2", "highContrastLight": "#0184bc" }
+        "description": "Teal tile color",
+        "defaults": { "dark": "#82c4c3", "light": "#5fa3a2", "highContrast": "#82c4c3", "highContrastLight": "#5fa3a2" }
       },
       {
         "id": "claudeTiles.pink",
-        "description": "Pink tile color",
-        "defaults": { "dark": "#e06c9a", "light": "#d63384", "highContrast": "#e06c9a", "highContrastLight": "#d63384" }
+        "description": "Dusty rose tile color",
+        "defaults": { "dark": "#d4a0b9", "light": "#b8849d", "highContrast": "#d4a0b9", "highContrastLight": "#b8849d" }
+      },
+      {
+        "id": "claudeTiles.orange",
+        "description": "Warm sand tile color",
+        "defaults": { "dark": "#d4b08c", "light": "#b8946e", "highContrast": "#d4b08c", "highContrastLight": "#b8946e" }
+      },
+      {
+        "id": "claudeTiles.yellow",
+        "description": "Soft gold tile color",
+        "defaults": { "dark": "#c9c08f", "light": "#a8a070", "highContrast": "#c9c08f", "highContrastLight": "#a8a070" }
+      },
+      {
+        "id": "claudeTiles.red",
+        "description": "Warm clay tile color",
+        "defaults": { "dark": "#c9908f", "light": "#a87271", "highContrast": "#c9908f", "highContrastLight": "#a87271" }
       }
     ]
   }

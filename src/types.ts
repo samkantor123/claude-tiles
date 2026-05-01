@@ -1,4 +1,4 @@
-export const COLOR_KEYS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'cyan', 'pink'] as const;
+export const COLOR_KEYS = ['blue', 'green', 'purple', 'cyan', 'pink', 'orange', 'yellow', 'red'] as const;
 export type ColorKey = typeof COLOR_KEYS[number];
 
 export interface WindowEntry {
