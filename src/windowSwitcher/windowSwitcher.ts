@@ -2,8 +2,6 @@ import { exec } from 'child_process';
 import { WindowEntry } from '../types';
 
 export function switchToWindow(entry: WindowEntry): void {
-  // Use AppleScript to find and raise the window by matching its title
-  // VS Code window titles contain the workspace folder name
   const searchTerms = [entry.workspaceName];
   if (entry.remoteHost) searchTerms.push(entry.remoteHost);
 
@@ -11,7 +9,6 @@ export function switchToWindow(entry: WindowEntry): void {
 }
 
 function raiseWindowByTitle(searchTerms: string[]): void {
-  // Build AppleScript conditions — window title must contain all search terms
   const conditions = searchTerms
     .map(term => {
       const escaped = term.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -27,8 +24,12 @@ delay 0.1
 tell application "System Events"
   tell process "Code"
     set frontmost to true
+    set currentPos to position of window 1
+    set currentSize to size of window 1
     repeat with w in windows
       if ${conditions} then
+        set position of w to currentPos
+        set size of w to currentSize
         perform action "AXRaise" of w
         return "switched"
       end if
@@ -40,7 +41,6 @@ return "not found"
 
   exec(`osascript -e ${escapeForShell(script)}`, (err, stdout) => {
     if (err || stdout.trim() === 'not found') {
-      // Last resort: just activate VS Code (brings some window forward)
       exec('open -a "Visual Studio Code"');
     }
   });
